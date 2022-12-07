@@ -16,7 +16,7 @@
 		
   		<style>
 	  		table {
-				border: 0px solid #cecece;
+				border: 1px solid #cecece;
 				}
 			th {
 				margin-top:20px;
@@ -24,11 +24,15 @@
 				padding-bottom: .6em;
 				width: 20%;
 				font-size: 130%;
+				border: 1px solid #cecece;
+				text-align:center;
 				}
 			td {
 				margin-top:20px;
 				padding-top: .6em;
 				padding-bottom: .6em;
+				border: 1px solid #cecece;
+				text-align:center;
 			}
 		
   	</style>
@@ -54,7 +58,7 @@
 				<input type="button" class="btn btn-primary" value="GetData" onclick="getData();"/>
 				</div>
 			</div>
-			<div class="col-lg-12 col-md-12 col-sm-12">
+			<div class="col-lg-12 col-md-12 col-sm-12" style="margin-top:2%;">
 			<table id="datasTable"  width="100%" style="border-bottom: 1px solid #ddd">
 			</table>
 			</div>
@@ -89,7 +93,7 @@
 							tablestring += '<td>'+json_obj[i].date_time+'</td>';
 							tablestring += '<td>'+json_obj[i].p_version+'</td>';
 							tablestring += '<td>'+json_obj[i].n_version+'</td>';							
-							tablestring += '<td><button onclick="revertVersion('+json_obj[i].p_version+','+json_obj[i].n_version+')">Revert</button></td>';
+							tablestring += '<td><button class="btn btn-warning" onclick="revertVersion('+json_obj[i].p_version+','+json_obj[i].n_version+')">Revert</button></td>';
 							tablestring += '</tr>';
 						}
 						
@@ -105,8 +109,8 @@
 					data: {
 						'action': 'createVersionData',
 						'datetime':current_date,
-						'p_version':p_ver,
-						'n_version':n_ver
+						'p_version':n_ver ,
+						'n_version':p_ver
 						},
 					url: "<?php echo $domainurl;?>/Service_Call.php", 
 					success:function(data){
