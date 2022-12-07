@@ -3,11 +3,11 @@
 	{
 		
 		public static function domainurl(){
-			$url = "http://sarwa.sinnonteq.com/product_data_import";
+			$url = "http://localhost/wordpress/wp-content/plugins/version_management/"; 
 			return $url;
 		}
 		public static function pluginurl(){
-			$url = "http://sarwa.sinnonteq.com/";
+			$url = "http://localhost/wordpress/";
 			return $url;
 		}
 		

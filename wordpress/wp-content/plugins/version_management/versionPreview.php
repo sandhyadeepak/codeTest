@@ -1,15 +1,18 @@
 <?php
-	
+	require_once("Common.php"); 
+	$common=new Common();
+	$domainurl = $common->domainurl();
 	
 ?> 
 <!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<title>Wordpress Version</title>
-  		<meta charset="utf-8">
-  		<meta name="viewport" content="width=device-width, initial-scale=1">
-  		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">  	
-  		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>		
 		
   		<style>
 	  		table {
@@ -27,47 +30,7 @@
 				padding-top: .6em;
 				padding-bottom: .6em;
 			}
-		 .upload{
-		 	margin-left:1%;
-			}
-	 	.submit{
-			 margin-left:5%;
-		 	}
-	 	.bigImage{
-			position: fixed;
-			width:240px;
-			height:220px;
-			z-index:100;
-			background:#fff;
-			right:40%;
-			top:50%;
-			margin: 10px;
-			transform:translateY(-50%);
-			display:none;
-			}
-		.bigImage img{
-			transform: scale(2, 1); /* Equal to scaleX(2) scaleY(0.5) */
-			transform-origin: center;
-			//background-color: pink;
-			}
-
-		.bigImage1{
-			position: fixed;
-			width:240px;
-			height:220px;
-			z-index:100;
-			background:#fff;
-			right:40%;
-			top:50%;
-			margin: 10px;
-			transform:translateY(-50%);
-			display:none;
-			}
-		.bigImage img1{
-		transform: scale(2, 1); /* Equal to scaleX(2) scaleY(0.5) */
-		transform-origin: center;
-		//background-color: pink;
-		}
+		
   	</style>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
@@ -92,14 +55,107 @@
 				</div>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12">
+			<table id="datasTable"  width="100%" style="border-bottom: 1px solid #ddd">
+			</table>
 			</div>
 		</div>
 	</div>
 
 
 <script type="text/javascript">
-	function getData(){
-		alert("get data")
+	
+	 $(document).ready(function(){
+		
+		
+		$.ajax({
+					type: "POST",
+					data: {
+						'action': 'getVersionData'						
+						},
+					url: "<?php echo $domainurl;?>/Service_Call.php", 
+					success:function(data){
+						var json_obj = $.parseJSON(data);
+						var tablestring='';
+						tablestring += '<tr>';
+						tablestring += '<th>Datetime</th>';
+						tablestring += '<th>Previous Version</th>';
+						tablestring += '<th>Updated Version</th>';
+						tablestring += '<th>Action</th>';
+						tablestring += '</tr>';
+					
+						for(var i in json_obj){
+							
+							tablestring += '<tr>';
+							tablestring += '<td>'+json_obj[i].date_time+'</td>';
+							tablestring += '<td>'+json_obj[i].p_version+'</td>';
+							tablestring += '<td>'+json_obj[i].n_version+'</td>';							
+							tablestring += '<td><button onclick="revertVersion('+json_obj[i].p_version+','+json_obj[i].n_version+')">Revert</button></td>';
+							tablestring += '</tr>';
+						}
+						
+						$('#datasTable').html(tablestring); 
+					} 
+			});
+		})
+
+	function revertVersion(p_ver,n_ver){
+		var current_date = new Date().toJSON().slice(0,19);		
+		$.ajax({
+					type: "POST",
+					data: {
+						'action': 'createVersionData',
+						'datetime':current_date,
+						'p_version':p_ver,
+						'n_version':n_ver
+						},
+					url: "<?php echo $domainurl;?>/Service_Call.php", 
+					success:function(data){
+						var json_obj = $.parseJSON(data);						
+						alert("Version Reverted");
+                        window.location.href = "http://localhost/wordpress/wp-admin/admin.php?page=version_listing";
+						
+					} 
+			});
+	}
+	function getData(){ 
+		
+		var fromversiontime = $("#fromversiontime").val();
+		var toversiontime = $("#toversiontime").val();
+		
+		$.ajax({
+					type: "POST",
+					data: {
+						'action': 'getFilteredData',
+						'fromversiontime':fromversiontime,
+						'toversiontime':toversiontime,
+						
+						},
+					url: "<?php echo $domainurl;?>/Service_Call.php", 
+					success:function(data){
+						$('#datasTable').html('');
+						var json_obj = $.parseJSON(data);
+						var tablestring='';
+						tablestring += '<tr>';
+						tablestring += '<th>Datetime</th>';
+						tablestring += '<th>Previous Version</th>';
+						tablestring += '<th>Updated Version</th>';
+						tablestring += '<th>Action</th>';
+						tablestring += '</tr>';
+					
+						for(var i in json_obj){
+							
+							tablestring += '<tr>';
+							tablestring += '<td>'+json_obj[i].date_time+'</td>';
+							tablestring += '<td>'+json_obj[i].p_version+'</td>';
+							tablestring += '<td>'+json_obj[i].n_version+'</td>';							
+							tablestring += '<td><button onclick="revertVersion('+json_obj[i].p_version+','+json_obj[i].n_version+')">Revert</button></td>';
+							tablestring += '</tr>';
+						}
+						
+						$('#datasTable').html(tablestring);  
+						
+					} 
+			});
 	}	
 </script>
 </body>
